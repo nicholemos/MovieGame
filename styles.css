@@ -1,0 +1,119 @@
+/* Estilos gerais */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f9;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Estilo do placar */
+#score-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    margin: 20px 0;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+/* Estilo para acertos e erros */
+.score-item {
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1.2em;
+    width: 150px;
+    text-align: center;
+}
+
+#score-correct {
+    background-color: #4caf50; /* Verde para vitórias */
+    color: white;
+}
+
+#score-incorrect {
+    background-color: #f44336; /* Vermelho para derrotas */
+    color: white;
+}
+
+
+/* Estilo do timer (relógio digital) */
+#timer {
+    font-size: 3em;
+    font-weight: bold;
+    margin: 20px 0;
+    padding: 20px;
+    border-radius: 10px;
+    width: 200px;
+    margin: 0 auto;
+    background-color: black;
+    color: lime; /* Cor característica de um relógio digital */
+    text-align: center;
+    font-family: 'Courier New', monospace; /* Fonte monoespaçada para o visual de relógio digital */
+}
+
+/* Alerta de tempo quase esgotado (quando estiver no amarelo) */
+#timer.warning {
+    background-color: #ff9800;
+}
+
+/* Alerta de tempo esgotado (quando estiver no vermelho) */
+#timer.expired {
+    background-color: red;
+}
+
+/* Estilo do botão de próximo */
+#next-btn {
+    padding: 10px 20px;
+    font-size: 1.2em;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#next-btn:hover {
+    background-color: #45a049;
+}
+
+#next-btn:disabled {
+    background-color: #b0b0b0;
+    cursor: not-allowed;
+}
+
+/* Estilo das opções de imagem */
+#options-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.image-option {
+    width: 150px;
+    height: 225px;
+    object-fit: cover;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.image-option:hover {
+    transform: scale(1.05);
+}
+
+/* Estilo para a sinopse e a mensagem de erro */
+#synopsis {
+    font-size: 1.2em;
+    margin-top: 20px;
+    color: #555;
+}
+
+#result {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+    margin-top: 20px;
+}
