@@ -92,16 +92,16 @@ body {
 }
 
 .image-option {
-    width: 150px;
-    height: 225px;
-    object-fit: cover;
+    width: 250px; /* Largura da imagem */
+    height: auto; /* Altura da imagem */
+    object-fit: cover; /* Faz a imagem preencher o espaço sem distorcer */
     border-radius: 5px;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease; /* Efeito de transição para o hover */
 }
 
 .image-option:hover {
-    transform: scale(1.05);
+    transform: scale(1.05); /* Aumenta a imagem ao passar o mouse */
 }
 
 /* Estilo para a sinopse e a mensagem de erro */
