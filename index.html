@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Quiz - Adivinhe a Capa</title>
+    <!-- Link para o arquivo CSS externo -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="game-container">
+    <h2>Jogo de Adivinhação de Filme</h2>
+  <div id="score-container">
+    <div id="score-correct" class="score-item correct">Vitórias: 0</div>
+    <div id="score-incorrect" class="score-item incorrect">Derrotas: 0</div>
+  </div>
+
+  <div id="timer">Tempo: 10s</div>
+
+    <div id="synopsis"></div>
+    <div id="options-container">
+        <!-- As opções de capa serão carregadas aqui -->
+    </div>
+    <div class="result" id="result"></div>
+    <button id="next-btn" onclick="nextGame()" style="display:none;">Próximo Filme</button>
+</div>
+
+<script src="quiz.js"></script>
+</body>
+</html>
