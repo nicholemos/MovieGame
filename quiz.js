@@ -1,165 +1,158 @@
 const apiKey = 'f3853edb736e04c1a9cb685d8a8951d0'; // Sua chave da API
 let correctMovie = null;
 let allMovies = [];
-let retryCount = 0; // Contador para as tentativas de recarga
-let score = 0; // Placar de acertos
-let errors = 0; // Contador de erros
-let timer; // Variável para o timer
-let countdown = 10; // Contagem regressiva de 10 segundos
+let score = 0;
+let errors = 0;
+let timer;
+let countdown = 10;
 
-document.addEventListener('DOMContentLoaded', () => {
+// Elementos da DOM
+const startScreen = document.getElementById('start-screen');
+const gameContainer = document.getElementById('game-container');
+const startBtn = document.getElementById('start-btn');
+const nextBtn = document.getElementById('next-btn');
+const timerElement = document.getElementById('timer');
+const resultElement = document.getElementById('result');
+const optionsContainer = document.getElementById('options-container');
+const actorsListElement = document.getElementById('actors-list');
+const scoreCorrectElement = document.getElementById('score-correct');
+const scoreIncorrectElement = document.getElementById('score-incorrect');
+
+
+// Event Listener para começar o jogo
+startBtn.addEventListener('click', () => {
+    startScreen.style.display = 'none';
+    gameContainer.style.display = 'block';
     nextGame();
 });
 
+// Event Listener para o botão "Próximo"
+nextBtn.addEventListener('click', nextGame);
+
 function nextGame() {
-    // Limpar a tela e o resultado anterior
-    document.getElementById('result').textContent = '';
-    document.getElementById('next-btn').style.display = 'none';
+    // Reseta a interface para a nova rodada
+    resultElement.textContent = '';
+    nextBtn.style.display = 'none';
+    optionsContainer.innerHTML = ''; // Limpa as capas anteriores
+    actorsListElement.textContent = 'Carregando filmes...';
 
-    // Atualiza os placares de vitórias e derrotas separadamente
-    document.getElementById('score-correct').textContent = `Vitórias: ${score}`;
-    document.getElementById('score-incorrect').textContent = `Derrotas: ${errors}`;
-
-    // Reiniciar a contagem regressiva
+    // Reseta o timer
+    clearInterval(timer);
     countdown = 10;
-    document.getElementById('timer').textContent = formatTime(countdown); // Exibe o tempo inicial como relógio digital
-
-    // Limpa qualquer estilo do timer (remove a classe 'expired' e 'warning')
-    const timerElement = document.getElementById('timer');
-    timerElement.classList.remove('expired', 'warning'); 
-
-    clearInterval(timer); // Limpa qualquer timer anterior
-    startTimer(); // Inicia a contagem regressiva
-
-    // Tentar buscar 4 filmes aleatórios com atores principais
-    loadMovies()
-        .then(() => {
-            displayGame();
-        })
-        .catch(error => {
-            console.error('Erro ao carregar os filmes:', error);
-            // Tentar recarregar automaticamente após erro
-            nextGame(); // Tenta recarregar
-        });
-  
-      document.getElementById('next-btn').style.display = 'inline-block'; 
-      console.log("Botão 'Próximo Filme' exibido.");
+    timerElement.textContent = countdown;
+    timerElement.classList.remove('expired', 'warning');
+    
+    // Inicia a busca pelos filmes e, em seguida, o jogo
+    loadMovies().then(() => {
+        displayGame();
+        startTimer();
+    }).catch(error => {
+        console.error('Falha crítica ao carregar filmes:', error);
+        actorsListElement.textContent = 'Não foi possível carregar os filmes. Tente novamente.';
+        // Poderíamos adicionar um botão para "Tentar Novamente" aqui
+    });
 }
-
-
 
 function loadMovies() {
-    // Faz a requisição de 4 filmes aleatórios
-    return Promise.all([getRandomMovie(), getRandomMovie(), getRandomMovie(), getRandomMovie()])
-        .then(movies => {
-            // Filtrando filmes que têm elenco principal
-            return Promise.all(movies.map(movie => getMovieCast(movie.id)))
-                .then(casts => {
-                    // Associando atores aos filmes
-                    movies.forEach((movie, index) => {
-                        movie.cast = casts[index];
-                    });
-
-                    // Filtrando filmes que têm pelo menos um ator principal
-                    allMovies = movies.filter(movie => movie.cast.length > 0);
-
-                    // Se não houver nenhum filme com elenco, tenta novamente
-                    if (allMovies.length === 0) {
-                        throw new Error('Nenhum filme com elenco encontrado.');
-                    }
-
-                    // Escolher um filme aleatório com elenco
-                    correctMovie = allMovies[Math.floor(Math.random() * allMovies.length)];
-                });
-        });
-}
-
-function getRandomMovie() {
-    const randomMovieId = Math.floor(Math.random() * 1000) + 1; // Número aleatório para filme
-    return fetch(`https://api.themoviedb.org/3/movie/${randomMovieId}?api_key=${apiKey}&language=pt-BR`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Erro ao carregar dados do filme');
+    // Função para buscar um único filme aleatório válido
+    const fetchRandomMovieWithPoster = async () => {
+        while (true) {
+            const randomMovieId = Math.floor(Math.random() * 5000) + 1;
+            const response = await fetch(`https://api.themoviedb.org/3/movie/${randomMovieId}?api_key=${apiKey}&language=pt-BR`);
+            if (response.ok) {
+                const movie = await response.json();
+                if (movie.poster_path) { // Garante que o filme tem um poster
+                    return movie;
+                }
             }
-            return response.json();
-        });
+        }
+    };
+    
+    // Busca 4 filmes com poster
+    const moviePromises = [fetchRandomMovieWithPoster(), fetchRandomMovieWithPoster(), fetchRandomMovieWithPoster(), fetchRandomMovieWithPoster()];
+    
+    return Promise.all(moviePromises).then(movies => {
+        allMovies = movies;
+        // Escolhe um filme aleatório para ser a resposta correta
+        correctMovie = allMovies[Math.floor(Math.random() * allMovies.length)];
+        // Busca o elenco do filme correto
+        return getMovieCast(correctMovie.id);
+    }).then(cast => {
+        correctMovie.cast = cast;
+        if (cast.length === 0) {
+            // Se o filme correto não tiver elenco, busca um novo conjunto de filmes
+            console.warn('Filme correto sem elenco, recarregando...');
+            return loadMovies();
+        }
+    });
 }
 
 function getMovieCast(movieId) {
     return fetch(`https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${apiKey}&language=pt-BR`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Erro ao carregar elenco');
-            }
-            return response.json();
-        })
-        .then(data => data.cast.slice(0, 3)); // Pegamos os 3 primeiros atores principais
+        .then(response => response.json())
+        .then(data => data.cast.slice(0, 3)); // Pega os 3 atores principais
 }
 
 function displayGame() {
-    // Exibir os atores principais como dica
-    const actors = correctMovie.cast.map(actor => actor.name).join(", ") || "Elenco não disponível.";
-    document.getElementById('synopsis').textContent = `Atores principais: ${actors}`;
+    // Exibe os atores como dica
+    const actors = correctMovie.cast.map(actor => actor.name).join(", ");
+    actorsListElement.textContent = `Atores: ${actors}`;
 
-    // Gerar as opções de capas
-    const optionsContainer = document.getElementById('options-container');
-    optionsContainer.innerHTML = ''; // Limpar opções anteriores
+    // Embaralha as opções de filmes para que a resposta correta não esteja sempre na mesma posição
+    allMovies.sort(() => Math.random() - 0.5);
 
+    // Cria e exibe as capas dos filmes
     allMovies.forEach(movie => {
         const img = document.createElement('img');
         img.src = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
         img.alt = movie.title;
         img.classList.add('image-option');
-        img.onclick = () => checkAnswer(movie);
+        img.onclick = () => checkAnswer(movie, img);
         optionsContainer.appendChild(img);
     });
 }
 
-function checkAnswer(selectedMovie) {
-    clearInterval(timer); // Parar o timer quando o jogador fizer a escolha
+function checkAnswer(selectedMovie, selectedImageElement) {
+    clearInterval(timer); // Para o timer
 
-    if (selectedMovie === correctMovie) {
-        document.getElementById('result').textContent = 'Parabéns! Você acertou!';
-        score++; // Incrementar o placar de acertos
+    // Desativa o clique em todas as opções
+    const allImages = document.querySelectorAll('.image-option');
+    allImages.forEach(img => img.classList.add('disabled'));
+
+    if (selectedMovie.id === correctMovie.id) {
+        resultElement.textContent = 'Parabéns! Você acertou!';
+        resultElement.style.color = '#4caf50';
+        selectedImageElement.classList.add('correct');
+        score++;
     } else {
-        document.getElementById('result').textContent = `Errado! A resposta correta era: "${correctMovie.title}"`;
-        errors++; // Incrementar o contador de erros
+        resultElement.textContent = `Errado! O correto era: "${correctMovie.title}"`;
+        resultElement.style.color = '#f44336';
+        selectedImageElement.classList.add('incorrect');
+        // Encontra e destaca a imagem correta
+        allImages.forEach(img => {
+            if (img.alt === correctMovie.title) {
+                img.classList.add('correct');
+            }
+        });
+        errors++;
     }
 
-    // Atualiza o placar e muda as cores
     updateScoreDisplay();
-
-    document.getElementById('next-btn').style.display = 'inline-block'; // Mostrar o botão de próximo filme
+    nextBtn.style.display = 'inline-block'; // Mostra o botão para ir para a próxima rodada
 }
 
 function updateScoreDisplay() {
-    const scoreElement = document.getElementById('score');
-    scoreElement.textContent = `Acertos: ${score} | Erros: ${errors}`;
-
-    // Atualiza a cor de acordo com o número de acertos/erros
-    scoreElement.classList.remove('correct', 'incorrect');
-    if (score > errors) {
-        scoreElement.classList.add('correct');
-    } else {
-        scoreElement.classList.add('incorrect');
-    }
-}
-
-// Função para formatar o tempo no estilo de relógio digital
-function formatTime(seconds) {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+    // CORRIGIDO: Atualiza os elementos corretos do placar
+    scoreCorrectElement.textContent = `Vitórias: ${score}`;
+    scoreIncorrectElement.textContent = `Derrotas: ${errors}`;
 }
 
 function startTimer() {
-    // Iniciar a contagem regressiva
     timer = setInterval(() => {
         countdown--;
-        document.getElementById('timer').textContent = formatTime(countdown); // Atualiza o tempo no formato digital
-
-        // Alterar cor conforme o tempo vai acabando
-        const timerElement = document.getElementById('timer');
+        timerElement.textContent = countdown;
+        
+        // Altera a cor do timer
         if (countdown <= 3) {
             timerElement.classList.add('expired');
             timerElement.classList.remove('warning');
@@ -168,11 +161,25 @@ function startTimer() {
         }
 
         if (countdown <= 0) {
-            clearInterval(timer); // Parar o timer
-            document.getElementById('result').textContent = `Tempo esgotado! A resposta correta era: "${correctMovie.title}"`;
-            errors++; // Incrementar o contador de erros
-            updateScoreDisplay(); // Atualiza o placar
-            document.getElementById('next-btn').style.display = 'inline-block'; // Mostrar o botão de próximo filme
+            clearInterval(timer);
+            handleTimeout();
         }
     }, 1000);
+}
+
+function handleTimeout() {
+    resultElement.textContent = `Tempo esgotado! O correto era: "${correctMovie.title}"`;
+    resultElement.style.color = '#f44336';
+    errors++;
+
+    // Destaca a resposta correta
+    document.querySelectorAll('.image-option').forEach(img => {
+        if (img.alt === correctMovie.title) {
+            img.classList.add('correct');
+        }
+        img.classList.add('disabled');
+    });
+
+    updateScoreDisplay();
+    nextBtn.style.display = 'inline-block';
 }
