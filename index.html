@@ -1,37 +1,134 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Atores em Cena: Qual é o Filme?</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
-<div id="start-screen">
-    <h1>Atores em Cena</h1>
-    <p>Adivinhe o filme correto com base nos atores principais.</p>
-    <div class="instructions">
-        <p>1. Nós mostraremos os nomes dos atores.</p>
-        <p>2. Quatro capas de filmes aparecerão.</p>
-        <p>3. Você terá <strong>10 segundos</strong> para escolher a capa certa!</p>
-    </div>
-    <button id="start-btn">Começar o Desafio!</button>
-</div>
+    <!-- Tela Inicial -->
+    <div id="start-screen">
+        <h1>Atores em Cena</h1>
+        <p>Teste seus conhecimentos sobre cinema!</p>
 
-<div id="game-container" style="display: none;">
-    <h2>Adivinhe o Filme!</h2>
-    <div id="score-container">
-        <div id="score-correct" class="score-item">Vitórias: 0</div>
-        <div id="score-incorrect" class="score-item">Derrotas: 0</div>
-    </div>
-
-    <div id="timer">10</div> <div id="actors-list"></div> <div id="options-container">
+        <!-- Seleção de Modo de Jogo -->
+        <div id="mode-selection">
+            <h3>1. Escolha um Modo de Jogo:</h3>
+            <div class="mode-buttons">
+                <button class="mode-btn" data-mode="classic">
+                    <h4>Clássico</h4>
+                    <p>3 vidas, 10s por rodada.</p>
+                </button>
+                <button class="mode-btn" data-mode="timeAttack">
+                    <h4>Contra o Relógio</h4>
+                    <p>90s para acertar o máximo.</p>
+                </button>
+                <button class="mode-btn" data-mode="survival">
+                    <h4>Sobrevivência</h4>
+                    <p>1 vida, sem tempo. Errou, acabou.</p>
+                </button>
+            </div>
         </div>
-    <div id="result"></div>
-    <button id="next-btn" style="display:none;">Próximo Filme</button>
-</div>
 
-<script src="quiz.js"></script>
+        <!-- Seleção de Gênero (inicialmente oculta ) -->
+        <div id="genre-selection" style="display: none;">
+            <h3>2. Escolha uma Categoria:</h3>
+            <div class="genre-buttons">
+                <button class="genre-btn" data-genre-id="28">Ação</button>
+                <button class="genre-btn" data-genre-id="35">Comédia</button>
+                <button class="genre-btn" data-genre-id="878">Ficção Científica</button>
+                <button class="genre-btn" data-genre-id="27">Terror</button>
+                <button class="genre-btn" data-genre-id="16">Animação</button>
+                <button class="genre-btn" data-genre-id="18">Drama</button>
+                <button class="genre-btn" data-genre-id="53">Suspense</button>
+                <button class="genre-btn" data-genre-id="">Aleatório</button>
+            </div>
+        </div>
+
+        <div class="start-options">
+            <button id="achievements-btn">Conquistas</button>
+        </div>
+    </div>
+
+    <!-- Container do Jogo -->
+    <div id="game-container" style="display: none;">
+        <div id="game-header">
+            <div id="score-container">
+                <div id="score-correct" class="score-item">Vitórias: 0</div>
+                <div id="lives-container" class="score-item">Vidas: 3</div>
+                <div id="score-xp" class="score-item">XP: 0</div>
+            </div>
+            <div id="timer">10</div>
+        </div>
+
+        <div id="hints-container">
+            <button id="hint-fifty-fifty" class="hint-btn">50/50 <span id="fifty-fifty-count">(1)</span></button>
+            <button id="hint-extra-time" class="hint-btn">Tempo +5s <span id="extra-time-count">(1)</span></button>
+            <button id="hint-year" class="hint-btn">Ano? <span id="year-count">(1)</span></button>
+        </div>
+
+        <div id="actors-list"></div>
+        <div id="options-container"></div>
+        <div id="result"></div>
+        <div id="streak-counter" style="display: none;">Sequência de Acertos: 0</div>
+        <button id="next-btn" style="display:none;">Próximo Filme</button>
+    </div>
+
+    <!-- Tela de Fim de Jogo -->
+    <div id="game-over-screen" style="display: none;">
+        <h2>Fim de Jogo!</h2>
+        <p>Sua pontuação final foi:</p>
+        <p id="final-score">0 vitórias</p>
+        <p id="final-score-xp" style="display: none;">0 XP</p>
+        <p id="final-streak" style="display: none;">Sequência Máxima: 0</p>
+
+        <div id="leaderboard-container">
+            <h3>Recordes</h3>
+            <table id="leaderboard-table">
+                <!-- Linhas da tabela serão inseridas aqui via JS -->
+            </table>
+        </div>
+
+        <button id="restart-btn">Jogar Novamente</button>
+    </div>
+
+    <!-- Overlay de Conquistas -->
+    <div id="achievements-overlay" style="display: none;">
+        <div id="achievements-modal">
+            <h2>Conquistas</h2>
+            <div id="achievements-list">
+                <!-- Conquistas serão inseridas aqui via JS -->
+            </div>
+            <button id="close-achievements-btn">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Pop-up de Notificação de Conquista -->
+    <div id="achievement-popup" style="display: none;">
+        <p><strong>Conquista Desbloqueada!</strong></p>
+        <p id="achievement-popup-title">Nome da Conquista</p>
+    </div>
+
+    <!-- Botão de Controle de Música -->
+    <div id="music-control">
+        <i class="fas fa-music"></i>
+    </div>
+
+    <!-- Efeitos Sonoros e Música -->
+    <audio id="correct-sound" src="https://www.myinstants.com/media/sounds/correct-sound-effect.mp3" preload="auto"></audio>
+    <audio id="incorrect-sound" src="https://www.myinstants.com/media/sounds/error_CDOxCYm.mp3" preload="auto"></audio>
+    <audio id="game-over-sound" src="https://www.myinstants.com/media/sounds/game-over-arcade-6435.mp3" preload="auto"></audio>
+    <audio id="click-sound" src="https://www.myinstants.com/media/sounds/mouse-click-153941.mp3" preload="auto"></audio>
+    <audio id="hint-sound" src="https://www.myinstants.com/media/sounds/hint.mp3" preload="auto"></audio>
+    <audio id="tick-sound" src="https://www.myinstants.com/media/sounds/321-go-sound-effect-no-copyright.mp3" preload="auto"></audio>
+    <audio id="background-music" src="https://www.chosic.com/wp-content/uploads/2021/07/The-Road-to-the-Light.mp3" loop preload="auto"></audio>
+
+    <script src="quiz.js"></script>
 </body>
+
 </html>
