@@ -4,7 +4,51 @@ body {
     background-color: #f4f4f9;
     text-align: center;
     padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
+
+/* Estilo da Tela Inicial */
+#start-screen {
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+#start-screen h1 {
+    font-size: 2.5em;
+    color: #333;
+}
+
+#start-screen p {
+    font-size: 1.2em;
+    color: #555;
+}
+
+#start-screen .instructions {
+    text-align: left;
+    display: inline-block;
+    margin: 20px 0;
+}
+
+#start-btn {
+    padding: 15px 30px;
+    font-size: 1.5em;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#start-btn:hover {
+    background-color: #218838;
+}
+
 
 /* Estilo do placar */
 #score-container {
@@ -17,7 +61,6 @@ body {
     font-weight: bold;
 }
 
-/* Estilo para acertos e erros */
 .score-item {
     padding: 10px 20px;
     border-radius: 5px;
@@ -27,93 +70,94 @@ body {
 }
 
 #score-correct {
-    background-color: #4caf50; /* Verde para vitórias */
+    background-color: #4caf50;
     color: white;
 }
 
 #score-incorrect {
-    background-color: #f44336; /* Vermelho para derrotas */
+    background-color: #f44336;
     color: white;
 }
 
-
-/* Estilo do timer (relógio digital) */
+/* Estilo do timer (simplificado) */
 #timer {
     font-size: 3em;
     font-weight: bold;
     margin: 20px 0;
-    padding: 20px;
-    border-radius: 10px;
-    width: 200px;
-    margin: 0 auto;
-    background-color: black;
-    color: lime; /* Cor característica de um relógio digital */
-    text-align: center;
-    font-family: 'Courier New', monospace; /* Fonte monoespaçada para o visual de relógio digital */
+    color: black;
 }
 
-/* Alerta de tempo quase esgotado (quando estiver no amarelo) */
 #timer.warning {
-    background-color: #ff9800;
+    color: #ff9800; /* Laranja */
 }
 
-/* Alerta de tempo esgotado (quando estiver no vermelho) */
 #timer.expired {
-    background-color: red;
+    color: red; /* Vermelho */
 }
 
-/* Estilo do botão de próximo */
-#next-btn {
-    padding: 10px 20px;
+/* Lista de atores */
+#actors-list {
     font-size: 1.2em;
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-#next-btn:hover {
-    background-color: #45a049;
-}
-
-#next-btn:disabled {
-    background-color: #b0b0b0;
-    cursor: not-allowed;
+    margin-top: 20px;
+    color: #555;
+    font-weight: bold;
 }
 
 /* Estilo das opções de imagem */
 #options-container {
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 15px;
     flex-wrap: wrap;
     margin-top: 20px;
 }
 
 .image-option {
-    width: 250px; /* Largura da imagem */
-    height: auto; /* Altura da imagem */
-    object-fit: cover; /* Faz a imagem preencher o espaço sem distorcer */
-    border-radius: 5px;
+    width: 200px; /* Ajustado */
+    height: 300px;
+    object-fit: cover;
+    border: 4px solid transparent; /* Borda para feedback */
+    border-radius: 8px;
     cursor: pointer;
-    transition: transform 0.3s ease; /* Efeito de transição para o hover */
+    transition: transform 0.3s ease, border-color 0.3s ease;
 }
 
 .image-option:hover {
-    transform: scale(1.05); /* Aumenta a imagem ao passar o mouse */
+    transform: scale(1.05);
 }
 
-/* Estilo para a sinopse e a mensagem de erro */
-#synopsis {
-    font-size: 1.2em;
-    margin-top: 20px;
-    color: #555;
+/* Feedback visual para as capas */
+.image-option.correct {
+    border-color: #4caf50; /* Borda Verde */
+    transform: scale(1.1);
+}
+
+.image-option.incorrect {
+    border-color: #f44336; /* Borda Vermelha */
+}
+
+.image-option.disabled {
+    pointer-events: none; /* Desativa o clique após a resposta */
+    opacity: 0.7;
 }
 
 #result {
     font-size: 1.5em;
     font-weight: bold;
-    color: #333;
     margin-top: 20px;
+}
+
+#next-btn {
+    padding: 10px 20px;
+    font-size: 1.2em;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+#next-btn:hover {
+    background-color: #0056b3;
 }
